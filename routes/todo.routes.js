@@ -4,7 +4,7 @@ const { TodoModel } = require("../model/todo");
 const { auth } = require("../middleware/auth");
 
 // Create a new todo
-todoRoute.post("/todos", auth, async (req, res) => {
+todoRoute.post("/addtodo", auth, async (req, res) => {
   try {
     const { title, description, completed } = req.body;
     //creating new todo
@@ -18,7 +18,7 @@ todoRoute.post("/todos", auth, async (req, res) => {
 });
 
 // Get all todos
-todoRoute.get("/todos", auth, async (req, res) => {
+todoRoute.get("/gettodo", auth, async (req, res) => {
   try {
     //getting all todos from db
     const todos = await TodoModel.find();
@@ -29,7 +29,7 @@ todoRoute.get("/todos", auth, async (req, res) => {
 });
 
 // Update a todo
-todoRoute.put("/todos/:id", auth, async (req, res) => {
+todoRoute.put("/updatetodo/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, completed } = req.body;
@@ -46,7 +46,7 @@ todoRoute.put("/todos/:id", auth, async (req, res) => {
 });
 
 // Delete a todo
-todoRoute.delete("/todos/:id", auth, async (req, res) => {
+todoRoute.delete("/deletetodo/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
     //deleting todo with id
@@ -56,3 +56,5 @@ todoRoute.delete("/todos/:id", auth, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+module.exports = { todoRoute };
