@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { UserModel } = require("../model/user");
+require("dotenv").config();
 
 const auth = async (req, res, next) => {
   try {
@@ -7,7 +8,7 @@ const auth = async (req, res, next) => {
     //checking token
     if (!token) return res.status(404).json({ msg: "token is not provided" });
     // comapring token
-    const decodeToken = jwt.verify(token, process.env.accessToken);
+    const decodeToken = jwt.verify(token, process.env.accesstoken);
     // finding user
     const user = await UserModel.findOne({ _id: decodeToken.userId });
     if (!user) {
