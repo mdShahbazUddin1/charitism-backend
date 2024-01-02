@@ -5,17 +5,18 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const userRoute = express.Router();
 
+//create new user
 userRoute.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
+    //checking user already present or not
     const isUserPresent = await UserModel.findOne({ email });
-
+    //checking if user email already exist
     if (isUserPresent)
       return res.status(404).send({ msg: "Email Already Register" });
-
+    //if email doesn't exist hasing the password
     const hasPassword = await bcrypt.hash(password, 10);
-
+    //creating new user with hashed password
     const newUser = new UserModel({ name, email, password: hasPassword });
     await newUser.save();
     res.status(200).send({ msg: "Registration Successful" });
@@ -24,26 +25,29 @@ userRoute.post("/register", async (req, res) => {
   }
 });
 
+//login with existing user
 userRoute.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    //checking user already present or not
     const isUserPresent = await UserModel.findOne({ email });
+    //checking if user email doesn't exist
     if (!isUserPresent)
       return res.status(404).send({ msg: "Invalid email or password" });
-
+    //verifying  register password with current password
     const verifyPassword = await bcrypt.compare(
       password,
       isUserPresent.password
     );
-
+    // password is not matched
     if (!verifyPassword)
       return res.status(404).send({ msg: "Invalid email or password" });
-
+    // if all ok generating jwt token
     const token = await jwt.sign(
       { userId: isUserPresent._id },
       process.env.accesstoken
     );
+    // sending response
     res.status(200).send({ msg: "Login Successful", token });
   } catch (error) {
     res.status(500).send({ msg: error.message });
