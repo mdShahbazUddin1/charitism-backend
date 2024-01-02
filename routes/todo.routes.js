@@ -34,14 +34,14 @@ todoRoute.put("/updatetodo/:id", auth, async (req, res) => {
     const { id } = req.params;
     const { title, description, completed } = req.body;
     //updating todo with id
-    const todo = await todoRoute.findByIdAndUpdate(
+    const todo = await TodoModel.findByIdAndUpdate(
       id,
       { title, description, completed },
       { new: true }
     );
     res.status(200).json(todo);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -50,7 +50,7 @@ todoRoute.delete("/deletetodo/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
     //deleting todo with id
-    await todoRoute.findByIdAndDelete(id);
+    await TodoModel.findByIdAndDelete(id);
     res.status(204).send({ msg: "Todo deleted" });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
