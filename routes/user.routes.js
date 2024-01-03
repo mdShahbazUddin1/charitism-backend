@@ -72,7 +72,7 @@ userRoute.get("/logout", auth, async (req, res) => {
     }
 
     const blacklistToken = new BlackListModel({
-      token: token,
+      blacklist: token,
     });
 
     await blacklistToken.save();

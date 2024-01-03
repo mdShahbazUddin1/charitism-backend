@@ -27,7 +27,7 @@ const auth = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid token" });
     }
-    const blacklistToken = await BlackListModel.findOne({ token: token });
+    const blacklistToken = await BlackListModel.findOne({ blacklist: token });
 
     if (blacklistToken) {
       return res.status(401).send({ msg: "login first" });
