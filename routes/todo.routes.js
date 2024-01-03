@@ -119,7 +119,7 @@ todoRoute.delete("/deletetodo/:id", auth, async (req, res) => {
     user.todos.pull({ _id: id });
     await user.save();
 
-    res.status(204).json({
+    res.status(200).json({
       message: "Todo deleted from the todos successfully",
       id,
     });
