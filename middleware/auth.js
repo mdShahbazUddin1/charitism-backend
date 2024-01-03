@@ -1,6 +1,19 @@
 const jwt = require("jsonwebtoken");
 const { UserModel } = require("../model/user");
+const { BlackListModel } = require("../model/blacklist");
 require("dotenv").config();
+
+const customMorgan = (tokens, req, res) => {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, "content-length"),
+    "-",
+    tokens["response-time"](req, res), // Log response time
+    "ms",
+  ].join(" ");
+};
 
 const auth = async (req, res, next) => {
   try {
@@ -14,6 +27,11 @@ const auth = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid token" });
     }
+    const blacklistToken = await BlackListModel.findOne({ token: token });
+
+    if (blacklistToken) {
+      return res.status(401).send({ msg: "login first" });
+    }
 
     req.user = user;
     req.userId = decodeToken.userId;
@@ -23,4 +41,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = { auth };
+module.exports = { auth, customMorgan };

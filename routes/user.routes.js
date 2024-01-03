@@ -2,6 +2,8 @@ const express = require("express");
 const { UserModel } = require("../model/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { auth } = require("../middleware/auth");
+const { BlackListModel } = require("../model/blacklist");
 require("dotenv").config();
 const userRoute = express.Router();
 
@@ -9,6 +11,9 @@ const userRoute = express.Router();
 userRoute.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ msg: "All fields are required" });
+    }
     //checking user already present or not
     const isUserPresent = await UserModel.findOne({ email });
     //checking if user email already exist
@@ -29,6 +34,11 @@ userRoute.post("/register", async (req, res) => {
 userRoute.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ msg: "Email and password are required" });
+    }
+
     //checking user already present or not
     const isUserPresent = await UserModel.findOne({ email });
     //checking if user email doesn't exist
@@ -51,6 +61,25 @@ userRoute.post("/login", async (req, res) => {
     res.status(200).send({ msg: "Login Successful", token });
   } catch (error) {
     res.status(500).send({ msg: error.message });
+  }
+});
+
+userRoute.get("/logout", auth, async (req, res) => {
+  try {
+    const token = req.headers?.authorization;
+    if (!token) {
+      return res.status(400).json({ msg: "Token is invalid or not provided" });
+    }
+
+    const blacklistToken = new BlackListModel({
+      token: token,
+    });
+
+    await blacklistToken.save();
+
+    res.status(200).json({ msg: "Logout success" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

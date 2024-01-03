@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const blacklistSchema = mongoose.Schema({
-  balcklist: { type: string },
+  balcklist: { type: String },
 });
 
 const BlackListModel = mongoose.model("Blacklist", blacklistSchema);
