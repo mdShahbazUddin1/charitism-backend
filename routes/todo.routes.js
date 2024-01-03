@@ -115,8 +115,11 @@ todoRoute.delete("/deletetodo/:id", auth, async (req, res) => {
         .json({ msg: "Todo not found or does not belong to the user" });
     }
 
-    // Remove the todo from the array
-    todoToDelete.remove();
+    // Remove the todo from the array if it exists
+    const index = user.todos.indexOf(todoToDelete);
+    if (index !== -1) {
+      user.todos.splice(index, 1);
+    }
 
     // Save the updated user document
     await user.save();
