@@ -101,30 +101,28 @@ todoRoute.delete("/deletetodo/:id", auth, async (req, res) => {
     const { id } = req.params;
 
     // Check if the todo with the given id belongs to the authenticated user
+    const isUserPresent = await UserModel.findById(req.userId);
     const user = await TodoModel.findOne({ userId: req.userId });
 
-    if (!user) {
-      return res.status(404).json({ msg: "User not found" });
+    if (!user || !isUserPresent) {
+      return res.status(404).json({ msg: "Unauthorized to delete" });
     }
 
-    const todoToDelete = user.todos.id(id);
+    // Check if the todo is in the todos array
+    const todoItem = user.todos.id(id);
 
-    if (!todoToDelete) {
-      return res
-        .status(404)
-        .json({ msg: "Todo not found or does not belong to the user" });
+    if (!todoItem) {
+      return res.status(404).json({ error: "Todo not found in the todos" });
     }
 
-    // Remove the todo from the array if it exists
-    const index = user.todos.indexOf(todoToDelete);
-    if (index !== -1) {
-      user.todos.splice(index, 1);
-    }
-
-    // Save the updated user document
+    // Remove the todo from the array and save the updated user document
+    user.todos.pull({ _id: id });
     await user.save();
 
-    res.status(204).send({ msg: "Todo deleted" });
+    res.status(204).json({
+      message: "Todo deleted from the todos successfully",
+      id,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
